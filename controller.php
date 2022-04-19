@@ -8,14 +8,22 @@
     
 public function sse() {
     return response()->stream(function () {
+                $i = 0;
                 while (true) {
-                    usleep(1000);
+                    $i++;
                     if (Cache::has('update_event_cache')) {
                         Cache::forget('update_event_cache');
                         echo "data: " . 'update' . "\n\n";
                         ob_flush();
                         flush();  
-                   }
+                    }
+                    if($i > 20000){
+                        $i = 0;
+                        echo "data: " . 'reload' . "\n\n";
+                        ob_flush();
+                        flush(); 
+                    }
+                    usleep(1000);
                 }
            }, 200, [
                 'Cache-Control' => 'no-cache',
